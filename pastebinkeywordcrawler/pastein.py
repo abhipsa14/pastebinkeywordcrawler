@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-"""
-Pastebin Keyword Crawler
-
-This script scrapes Pastebin's public archive for pastes containing crypto-related 
-keywords or Telegram links and saves the results to a JSONL file.
-"""
-
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -27,11 +19,8 @@ logging.basicConfig(
     ]
 )
 
-class PastebinCrawler:
-    """Crawler for Pastebin that searches for crypto and Telegram-related content."""
-    
+class PastebinCrawler:    
     def __init__(self, keywords=None, output_file="keyword_matches.jsonl"):
-        """Initialize the crawler with keywords to search for."""
         self.archive_url = "https://pastebin.com/archive"
         self.raw_paste_url = "https://pastebin.com/raw/{}"
         
@@ -51,7 +40,6 @@ class PastebinCrawler:
             os.makedirs(output_dir)
 
     def get_archive_paste_ids(self):
-        """Fetch and extract the latest 30 paste IDs from the archive page."""
         try:
             response = requests.get(self.archive_url, headers=self.headers)
             response.raise_for_status()
@@ -77,13 +65,9 @@ class PastebinCrawler:
             return []
 
     def fetch_paste_content(self, paste_id):
-        """Fetch the content of a paste given its ID."""
         url = self.raw_paste_url.format(paste_id)
-        
         try:
-          
             time.sleep(random.uniform(1.0, 3.0))
-            
             response = requests.get(url, headers=self.headers)
             response.raise_for_status()
             return response.text
@@ -93,7 +77,6 @@ class PastebinCrawler:
             return None
 
     def check_keywords(self, content):
-        """Check if any keywords are present in the content."""
         if not content:
             return []
         
@@ -111,7 +94,6 @@ class PastebinCrawler:
         return found_keywords
 
     def process_paste(self, paste_id):
-        """Process a single paste: fetch content, check keywords, save if matched."""
         logging.info(f"Processing paste: {paste_id}")
         
         content = self.fetch_paste_content(paste_id)
@@ -142,7 +124,6 @@ class PastebinCrawler:
             return None
 
     def save_result(self, result):
-        """Save a single result to the output file."""
         if not result:
             return
             
@@ -150,7 +131,6 @@ class PastebinCrawler:
             f.write(json.dumps(result) + '\n')
             
     def run(self, max_workers=5):
-        """Run the crawler to process all pastes from the archive."""
         logging.info("Starting Pastebin crawler")
         
         # Get paste IDs from archive
@@ -177,6 +157,5 @@ class PastebinCrawler:
 
 
 if __name__ == "__main__":
-    
     crawler = PastebinCrawler()
     crawler.run()
